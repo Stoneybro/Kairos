@@ -1,66 +1,16 @@
-## Foundry
+2hrs
+1. fix penalty mechanism 20mins
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+2. figure out how the mechanism works in relation buddys signing of tasks to allow completion
 
-Foundry consists of:
+3. figure out if its feasible to add buddy signing tasks, and how long it would take
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
-## Documentation
 
-https://book.getfoundry.sh/
+3hrs
+1. reach 90% coverage for both task manager adn simple account:
+2. run invariant state testing:
 
-## Usage
 
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+3hrs figure out 
+deployment and strategy for frontend

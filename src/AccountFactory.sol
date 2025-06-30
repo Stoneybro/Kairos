@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {SimpleAccount} from "./SimpleAccount.sol";
+import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract AccountFactory {
     /*//////////////////////////////////////////////////////////////
@@ -13,20 +14,29 @@ contract AccountFactory {
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
     address public immutable implementation;
-    mapping (address user => address clone) public userClones;
-
+    mapping(address user => address clone) public userClones;
+    address private immutable i_entryPoint;
+    address public immutable s_owner;
+    
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
-    event cloneCreated(address indexed clone,address indexed user,bytes32 indexed salt);
+    event CloneCreated(address indexed clone, address indexed user, bytes32 indexed salt);
+    
     /*//////////////////////////////////////////////////////////////
                                  ERRORS
     //////////////////////////////////////////////////////////////*/
-    error AccountFactory__contractAlreadyDeployed();
+    error AccountFactory__ContractAlreadyDeployed();
+    error AccountFactory__InitializationFailed();
 
     /*CONSTRUCTOR*/
-    constructor() {
-        implementation=address(new SimpleAccount());
+    constructor(address entryPoint, address owner) {
+        if (entryPoint == address(0)) revert("Invalid entry point");
+        if (owner == address(0)) revert("Invalid owner");
+        
+        implementation = address(new SimpleAccount());
+        i_entryPoint = entryPoint;
+        s_owner = owner;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -34,22 +44,37 @@ contract AccountFactory {
     //////////////////////////////////////////////////////////////*/
 
     function createAccount(uint256 userNonce) external returns (address) {
-        bytes32 salt=keccak256(abi.encodePacked(msg.sender,userNonce));
-        address predictedAddress =
-            Clones.predictDeterministicAddress(implementation, salt);
+        bytes32 salt = keccak256(abi.encodePacked(msg.sender, userNonce));
+        address predictedAddress = Clones.predictDeterministicAddress(implementation, salt);
 
         if (predictedAddress.code.length != 0) {
-            revert AccountFactory__contractAlreadyDeployed();
+            revert AccountFactory__ContractAlreadyDeployed();
         }
+        
         address account = Clones.cloneDeterministic(implementation, salt);
-        userClones[msg.sender]=account;
-        emit cloneCreated(account,msg.sender,salt);
-        SimpleAccount(payable(account)).initialize(msg.sender);
-
-        return account;
+        userClones[msg.sender] = account;
+        
+        emit CloneCreated(account, msg.sender, salt);
+        
+        // Initialize the account - add error handling
+        try SimpleAccount(payable(account)).initialize(msg.sender, i_entryPoint) {
+            return account;
+        } catch {
+            revert AccountFactory__InitializationFailed();
+        }
     }
-    function getAddress(uint256 userNonce) external view  returns (address predictedAddress) {
-        bytes32 salt=keccak256(abi.encodePacked(msg.sender,userNonce));
-        predictedAddress=Clones.predictDeterministicAddress(implementation,salt);
+    
+    function getAddress(uint256 userNonce) external view returns (address predictedAddress) {
+        bytes32 salt = keccak256(abi.encodePacked(msg.sender, userNonce));
+        predictedAddress = Clones.predictDeterministicAddress(implementation, salt);
+    }
+    
+    function getAddressForUser(address user, uint256 userNonce) external view returns (address predictedAddress) {
+        bytes32 salt = keccak256(abi.encodePacked(user, userNonce));
+        predictedAddress = Clones.predictDeterministicAddress(implementation, salt);
+    }
+    
+    function getUserClone(address user) external view returns (address) {
+        return userClones[user];
     }
 }

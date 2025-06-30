@@ -5,16 +5,21 @@ import {DeployAccountFactory} from "script/DeployAccountFactory.s.sol";
 import {AccountFactory} from "src/AccountFactory.sol";
 import {SimpleAccount} from "src/SimpleAccount.sol";
 import {Test} from "forge-std/Test.sol";
+import {HelperConfig} from "script/HelperConfig.s.sol";
 
 contract AccountFactoryTest is Test {
     DeployAccountFactory deployFactory;
     AccountFactory factory;
     address user;
-
+    HelperConfig config;
+    address entryPoint;
     function setUp() public {
         deployFactory = new DeployAccountFactory();
-        factory = deployFactory.run();
+       (factory,config) = deployFactory.run();
         user = makeAddr("user");
+        config= new HelperConfig();
+        HelperConfig.NetworkConfig memory newConfig=config.getConfig();
+         entryPoint=newConfig.entryPoint;
     }
 
     function testCreateAccount() external {
@@ -37,9 +42,9 @@ contract AccountFactoryTest is Test {
 
     function testAccountAlreadyCreated() external {
         vm.startPrank(user);
-        address accountAddress = factory.createAccount(1);
-        vm.expectRevert(AccountFactory.AccountFactory__contractAlreadyDeployed.selector);
-        address secondAccountAddress = factory.createAccount(1);
+         factory.createAccount(1);
+        vm.expectRevert(AccountFactory.AccountFactory__ContractAlreadyDeployed.selector);
+       factory.createAccount(1);
         vm.stopPrank();
     }
 
@@ -48,14 +53,14 @@ contract AccountFactoryTest is Test {
         bytes32 salt = keccak256(abi.encodePacked(user, userNonce));
         vm.startPrank(user);
         vm.expectEmit();
-        emit AccountFactory.cloneCreated(factory.getAddress(1), user, salt);
-        address accountAddress = factory.createAccount(1);
+        emit AccountFactory.CloneCreated(factory.getAddress(1), user, salt);
+         factory.createAccount(1);
         vm.stopPrank();
     }
 
     function testNewUserCanCreateAccount() external {
          vm.startPrank(user);
-        address accountAddress = factory.createAccount(1);
+         factory.createAccount(1);
         vm.stopPrank();
         address newUser = makeAddr("newUser");
         vm.startPrank(newUser);
@@ -71,7 +76,7 @@ contract AccountFactoryTest is Test {
         vm.startPrank(user);
         address accountAddress = factory.createAccount(1);
         vm.expectRevert();
-        SimpleAccount(payable(accountAddress)).initialize(user); // Should revert
+        SimpleAccount(payable(accountAddress)).initialize(user,entryPoint); // Should revert
         vm.stopPrank();
     }
 
@@ -84,7 +89,7 @@ contract AccountFactoryTest is Test {
         assertTrue(firstAccount != secondAccount);
     }
 
-    function testPredictedAddressChangesWithNonce() external {
+    function testPredictedAddressChangesWithNonce() view external {
         address predictedFirst = factory.getAddress(1);
         address predictedSecond = factory.getAddress(2);
 

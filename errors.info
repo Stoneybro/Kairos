@@ -1,0 +1,43 @@
+
+╭---------------------------------------------+----------╮
+| Error                                       | Selector |
++========================================================+
+| ECDSAInvalidSignature()                     | f645eedf |
+|---------------------------------------------+----------|
+| ECDSAInvalidSignatureLength(uint256)        | fce698f7 |
+|---------------------------------------------+----------|
+| ECDSAInvalidSignatureS(bytes32)             | d78bce0c |
+|---------------------------------------------+----------|
+| InvalidInitialization()                     | f92ee8a9 |
+|---------------------------------------------+----------|
+| NotInitializing()                           | d7e6bcf8 |
+|---------------------------------------------+----------|
+| ReentrancyGuardReentrantCall()              | 3ee5aeb5 |
+|---------------------------------------------+----------|
+| SimpleAccount_PickAPenalty()                | ec248db6 |
+|---------------------------------------------+----------|
+| SimpleAccount__AddMoreFunds()               | 0b493ffd |
+|---------------------------------------------+----------|
+| SimpleAccount__ExecutionFailed(bytes)       | 03466c32 |
+|---------------------------------------------+----------|
+| SimpleAccount__NotFromEntryPoint()          | 6e38aa3c |
+|---------------------------------------------+----------|
+| SimpleAccount__OnlyOwnerCanCall()           | f11c14eb |
+|---------------------------------------------+----------|
+| SimpleAccount__OnlyTaskManagerCanCall()     | 7895c0ed |
+|---------------------------------------------+----------|
+| SimpleAccount__PayPrefundFailed()           | 03e87b58 |
+|---------------------------------------------+----------|
+| SimpleAccount__PenaltyDurationNotElapsed()  | b4641fcd |
+|---------------------------------------------+----------|
+| SimpleAccount__PenaltyTypeMismatch()        | 916b9dfa |
+|---------------------------------------------+----------|
+| SimpleAccount__TaskCreationFailed()         | e59191ba |
+|---------------------------------------------+----------|
+| SimpleAccount__TaskManagerAlreadyDeployed() | 79f75c46 |
+|---------------------------------------------+----------|
+| SimpleAccount__TaskRewardPaymentFailed()    | 653fefd3 |
+|---------------------------------------------+----------|
+| SimpleAccount__UnlinkCurrentTaskManager()   | 456f6153 |
+╰---------------------------------------------+----------╯
+
